@@ -64,7 +64,22 @@ function initMap() { // Google Map Initialization...
     });
 
 /////////
+map.data.loadGeoJson('https://dgncfe21.github.io/testGeoJsonv1/CircuitosMtyv1.json');
+map.data.setStyle({
+  fillColor: 'red',
+  strokeWeight: 2
+});
 
+var infowindow = new google.maps.InfoWindow();
+			
+			map.data.addListener('click', function(event) {
+			  let ciclo = event.feature.getProperty("CICLO");
+			  let html = 'CICLO: ' + ciclo; // combine state name with a label
+			  infowindow.setContent(html); // show the html variable in the infowindow
+			  infowindow.setPosition(event.latLng); // anchor the infowindow at the marker
+			  infowindow.setOptions({pixelOffset: new google.maps.Size(0,-30)}); // move the infowindow up slightly to the top of the marker icon
+			  infowindow.open(map);
+			});
 
 
 
