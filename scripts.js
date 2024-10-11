@@ -10,14 +10,14 @@
 // };
 
 const config = {
-     apiKey: "AIzaSyCAnem1AQOz9iWy2f8t8XDBKztK6kvThGs",
-  authDomain: "alumbradopte21.firebaseapp.com",
-  databaseURL: "https://alumbradopte21-default-rtdb.firebaseio.com",
-  projectId: "alumbradopte21",
-  storageBucket: "alumbradopte21.appspot.com",
-  messagingSenderId: "651178194520",
-  appId: "1:651178194520:web:987e5d240f8ab838d3fc2d",
-  measurementId: "G-VRH3BTZEQW"
+     apiKey: "AIzaSyCGuGpJEWo1_9gWwgSv3JO9s1051wDpY6E",
+  authDomain: "alumbradopubliconte.firebaseapp.com",
+  databaseURL: "https://alumbradopubliconte-default-rtdb.firebaseio.com",
+  projectId: "alumbradopubliconte",
+  storageBucket: "alumbradopubliconte.appspot.com",
+  messagingSenderId: "842157703635",
+  appId: "1:842157703635:web:64db480e6191f6c0326f26",
+  measurementId: "G-H4PG2MM8S5"
 
   // apiKey: "AIzaSyBRVBJuvk-Mbxzv2DTx2a18jPaope7gBPY",
   // authDomain: "usrsmty.firebaseapp.com",
@@ -247,52 +247,91 @@ function flyToStore(currentFeature) {
     map.panTo({ lat: latitud, lng: longitud });
 }
 
-// get firebase database reference...
-var cars_Ref = firebase.database().ref('/LAMPARAS_E2');
+// Get Firebase database references for multiple buckets
+var lamparasRef = firebase.database().ref('CAM3');
+var cam1Ref = firebase.database().ref('/CAM1');
+var cam2Ref = firebase.database().ref('/CAM2');
 
+// Function to handle 'child_added' event for any bucket
+function handleChildAdded(data, bucketName) {
+    let conductor = data.val();
+    console.log("Data added in bucket: " + bucketName, conductor);
+    // Add your marker or other logic here
+    cars_count++;
+}
 
-var dataConductores = firebase.database().ref('/LAMPARAS_E2');
-dataConductores.on('value', function (snapshot) {
-    //updateStarCount(postElement, snapshot.val());
+// Function to handle 'child_changed' event for any bucket
+function handleChildChanged(data, bucketName) {
+    markers[data.key].setMap(null); // Remove existing marker
+    let conductor = data.val();
+    console.log("Data changed in bucket: " + bucketName, conductor);
+    // Add updated marker or other logic here
+}
 
+// Function to handle 'child_removed' event for any bucket
+function handleChildRemoved(data, bucketName) {
+    markers[data.key].setMap(null); // Remove the marker for the removed item
+    cars_count--;
+    document.getElementById("cars").innerHTML = cars_count;
+    console.log("Data removed in bucket: " + bucketName);
+}
+
+// Listen for events for each bucket
+
+// For LAMPARAS_E2
+lamparasRef.on('child_added', function(data) {
+    handleChildAdded(data, 'CAM3');
+});
+lamparasRef.on('child_changed', function(data) {
+    handleChildChanged(data, 'CAM3');
+});
+lamparasRef.on('child_removed', function(data) {
+    handleChildRemoved(data, 'CAM3');
+});
+
+// For CAM1
+cam1Ref.on('child_added', function(data) {
+    handleChildAdded(data, 'CAM1');
+});
+cam1Ref.on('child_changed', function(data) {
+    handleChildChanged(data, 'CAM1');
+});
+cam1Ref.on('child_removed', function(data) {
+    handleChildRemoved(data, 'CAM1');
+});
+
+// For CAM2
+cam2Ref.on('child_added', function(data) {
+    handleChildAdded(data, 'CAM2');
+});
+cam2Ref.on('child_changed', function(data) {
+    handleChildChanged(data, 'CAM2');
+});
+cam2Ref.on('child_removed', function(data) {
+    handleChildRemoved(data, 'CAM2');
+});
+
+// Conductors List Update
+function buildLococationConductoresList(conductoresArray) {
+    // Your logic for building the list of conductors goes here
+}
+
+// Listening for value changes for conductors in different buckets
+var dataConductoresRef = firebase.database().ref('/CAM3'); // Adjust this to match your needs
+dataConductoresRef.on('value', function(snapshot) {
     let conductores = snapshot.val();
-    conductoresArray = [];
+    let conductoresArray = [];
+
     for (const key in conductores) {
         if (conductores.hasOwnProperty(key)) {
             const element = conductores[key];
-            //console.log(element);
             conductoresArray.push(element);
-
-
         }
     }
 
     buildLococationConductoresList(conductoresArray);
 });
 
-// this event will be triggered when a new object will be added in the database...
-cars_Ref.on('child_added', function (data) {
-    //console.log(data.val());
-    cars_count++;
-    //AddMarkerConductor(data);
-    let conductor = data.val();
-
-});
-
-// this event will be triggered on location change of any car...
-cars_Ref.on('child_changed', function (data) {
-    markers[data.key].setMap(null);
-    //AddMarkerConductor(data);
-    let conductor = data.val();
-
-});
-
-// If any car goes offline then this event will get triggered and we'll remove the marker of that car...  
-cars_Ref.on('child_removed', function (data) {
-    markers[data.key].setMap(null);
-    cars_count--;
-    document.getElementById("cars").innerHTML = cars_count;
-});
 
 
 function AddPedido(data) {
